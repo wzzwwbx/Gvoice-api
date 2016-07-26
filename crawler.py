@@ -1,6 +1,6 @@
 import requests
 import bs4
-
+import re
 
 def search(query):
     url = 'http://baike.baidu.com/search'
@@ -20,15 +20,27 @@ def search(query):
 
 def parse(html_content):
     soup = bs4.BeautifulSoup(html_content, "lxml")
+
+    result_num = soup.find_all(name='div', attrs={"class": "result-count"})
+    print(result_num)
+    if not result_num:
+        return ""
+
     result_links = soup.select('#body_wrapper  div.searchResult  dl dd a')
-    url = result_links[0].attrs.get('href')
-    title = soup.select('#body_wrapper  div.searchResult  dl dd a em')[0].get_text()
-    content = soup.select('#body_wrapper  div.searchResult  dl dd p')[0].get_text()
+    url = soup.find(name='a', attrs={"class": "result-title"}).attrs.get('href')
+    title = soup.find(name='a', attrs={"class": "result-title"}).get_text()
+    content = soup.find(name='p', attrs={"class": "result-summary"}).get_text()
     # get picture id
     url_content = requests.get(url)
     url_content.encoding = 'utf-8'
     url_soup = bs4.BeautifulSoup(url_content.text, "lxml")
-    pictureUrl = url_soup.select('body div.body-wrapper div.content-wrapper div div.side-content div.summary-pic a img')[0].get('src')
+    # pictureUrl = url_soup.select('body div.body-wrapper div.content-wrapper div div.side-content div.summary-pic a img')[0].get('src')
+    pictureUrl_list = url_soup.find_all(name = 'img', attrs={"src": re.compile(r'^http?://.+\.(jpg|png)')})
+    pictureUrl = ''
+    if pictureUrl_list:
+        pictureUrl = pictureUrl_list[0].get('src')
+
+    print(pictureUrl)
     return formResult(title, content, pictureUrl, url)
 
 def formResult(title, content, pictureUrl, url):
@@ -40,4 +52,4 @@ def formResult(title, content, pictureUrl, url):
     }
 
 if __name__ == '__main__':
-    search('')
+    search('1534日r')

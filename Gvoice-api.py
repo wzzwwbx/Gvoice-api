@@ -32,7 +32,6 @@ def not_found(error):
 def create_query():
     if not request.json or not 'query' in request.json:
         abort(400)
-
     result = query(request.json['query'])
     print(result)
     return jsonify({'result': result}), 200
