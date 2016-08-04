@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import requests
 import bs4
 import re
@@ -8,7 +10,7 @@ def search(query):
         'word': query,
         'pn': 0,
         'rn': 0,
-        'enc': 'utf8'
+        'enc': 'utf-8'
     }
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36'}
@@ -22,7 +24,7 @@ def parse(html_content):
     soup = bs4.BeautifulSoup(html_content, "lxml")
 
     result_num = soup.find_all(name='div', attrs={"class": "result-count"})
-    print(result_num)
+    # print(result_num[0].get_text())
     if not result_num:
         return ""
 
@@ -52,4 +54,4 @@ def formResult(title, content, pictureUrl, url):
     }
 
 if __name__ == '__main__':
-    search('1534日r')
+    search('太阳')
